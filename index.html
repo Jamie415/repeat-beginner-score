@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Repeat Beginner™ Score</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,800;1,400&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #2e2dc4;
+      --surface: #2828b0;
+      --surface2: #2323a0;
+      --gold: #f47920;
+      --gold-light: #ff9340;
+      --cream: #ffffff;
+      --cream-dim: rgba(255,255,255,0.72);
+      --muted: rgba(255,255,255,0.35);
+      --border: rgba(255,255,255,0.15);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--cream);
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .screen { display: none; min-height: 100vh; animation: fadeIn 0.45s ease; }
+    .screen.active { display: flex; flex-direction: column; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+    /* WELCOME */
+    #screen-welcome {
+      align-items: center; justify-content: center;
+      padding: 60px 24px; text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, rgba(244,121,32,0.18) 0%, transparent 55%);
+    }
+    .logo-mark {
+      width: 58px; height: 58px;
+      border: 2px solid var(--gold); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 36px;
+      color: var(--gold);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; font-weight: 800;
+    }
+    h1.welcome-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(38px, 7vw, 66px);
+      font-weight: 800; line-height: 1.05;
+      text-transform: uppercase;
+      color: var(--cream); max-width: 680px;
+      margin: 0 auto 16px;
+    }
+    .gold-word { color: var(--gold); }
+    .welcome-subtitle {
+      color: var(--cream-dim);
+      font-size: 17px; max-width: 490px;
+      margin: 0 auto 40px; line-height: 1.65;
+    }
+    .disciplines-preview {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      justify-content: center; max-width: 560px;
+      margin: 0 auto 48px;
+    }
+    .discipline-pill {
+      border: 1px solid var(--border); border-radius: 20px;
+      padding: 6px 16px; font-size: 12px;
+      letter-spacing: 0.04em; color: var(--cream-dim);
+      background: var(--surface);
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--bg);
+      border: none; padding: 16px 44px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 600;
+      border-radius: 4px; cursor: pointer;
+      letter-spacing: 0.02em; transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+    .meta-text { margin-top: 18px; font-size: 13px; color: var(--muted); }
+
+    /* QUESTION */
+    #screen-question { padding: 0; }
+    .progress-bar-outer {
+      width: 100%; height: 3px; background: var(--border);
+      position: fixed; top: 0; left: 0; z-index: 100;
+    }
+    .progress-bar-inner { height: 100%; background: var(--gold); transition: width 0.4s ease; }
+    .question-header {
+      padding: 32px 40px 0;
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 720px; margin: 0 auto; width: 100%;
+    }
+    .discipline-label {
+      font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .question-counter { font-size: 12px; color: var(--muted); }
+    .question-body {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; padding: 48px 40px;
+      max-width: 720px; margin: 0 auto; width: 100%;
+    }
+    .question-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(19px, 3.2vw, 27px);
+      font-weight: 600; line-height: 1.42;
+      color: var(--cream); margin-bottom: 36px;
+    }
+    .options-grid { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 18px 22px;
+      text-align: left; cursor: pointer;
+      transition: all 0.18s;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .option-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.06);
+      transform: translateX(4px);
+    }
+    .option-btn.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.1);
+    }
+    .option-letter {
+      width: 26px; height: 26px; min-width: 26px;
+      border-radius: 50%; border: 1px solid var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--muted);
+      font-family: 'Barlow Condensed', sans-serif;
+      margin-top: 1px; transition: all 0.18s;
+    }
+    .option-btn:hover .option-letter,
+    .option-btn.selected .option-letter {
+      border-color: var(--gold); color: var(--gold);
+      background: rgba(201,168,76,0.15);
+    }
+    .option-text { font-size: 15px; color: var(--cream-dim); line-height: 1.5; }
+    .option-btn:hover .option-text,
+    .option-btn.selected .option-text { color: var(--cream); }
+    .question-nav {
+      padding: 0 40px 44px;
+      max-width: 720px; margin: 0 auto;
+      width: 100%; display: flex; justify-content: flex-end;
+    }
+    .btn-next {
+      background: transparent; border: 1px solid var(--gold);
+      color: var(--gold); padding: 12px 32px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 15px;
+      border-radius: 4px; cursor: pointer;
+      transition: all 0.2s; opacity: 0.35; pointer-events: none;
+    }
+    .btn-next.enabled { opacity: 1; pointer-events: all; }
+    .btn-next.enabled:hover { background: var(--gold); color: var(--bg); }
+
+    /* EMAIL */
+    #screen-email { align-items: center; justify-content: center; padding: 60px 24px; text-align: center; }
+    .email-card { max-width: 520px; width: 100%; }
+    .eyebrow {
+      font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 18px;
+    }
+    .email-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700; line-height: 1.2; margin-bottom: 14px;
+    }
+    .email-sub {
+      color: var(--cream-dim); font-style: italic;
+      font-size: 15px; line-height: 1.65; margin-bottom: 36px;
+    }
+    .email-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .email-input {
+      flex: 1; background: var(--surface);
+      border: 1px solid var(--border); border-radius: 4px;
+      padding: 14px 18px; color: var(--cream);
+      font-family: 'Barlow', sans-serif; font-size: 15px;
+      outline: none; transition: border-color 0.2s;
+    }
+    .email-input:focus { border-color: var(--gold); }
+    .email-input::placeholder { color: var(--muted); }
+    .privacy-note { font-size: 12px; color: var(--muted); }
+
+    /* LOADING */
+    #screen-loading { align-items: center; justify-content: center; padding: 60px 24px; text-align: center; }
+    .loading-inner { max-width: 380px; }
+    .loading-ring {
+      width: 64px; height: 64px;
+      border: 2px solid var(--border); border-top-color: var(--gold);
+      border-radius: 50%; margin: 0 auto 32px;
+      animation: spin 1.1s linear infinite;
+    }
+    .loading-title { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+    .loading-sub { color: var(--cream-dim); font-style: italic; font-size: 14px; animation: pulse 2s ease infinite; }
+
+    /* RESULTS */
+    #screen-results { align-items: center; }
+    .results-container { max-width: 800px; width: 100%; margin: 0 auto; padding: 60px 28px 80px; }
+    .archetype-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 5vw, 46px);
+      font-weight: 700; line-height: 1.18;
+      margin-bottom: 18px; color: var(--cream);
+    }
+    .archetype-desc {
+      color: var(--cream-dim); font-size: 16px;
+      line-height: 1.72; max-width: 620px;
+      margin-bottom: 44px; font-style: italic;
+    }
+    .overall-badge {
+      display: inline-flex; align-items: baseline; gap: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 24px; margin-bottom: 52px;
+    }
+    .overall-label { font-size: 13px; color: var(--cream-dim); }
+    .overall-number { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 700; color: var(--gold); line-height: 1; }
+    .overall-denom { font-size: 16px; color: var(--muted); }
+
+    .radar-section {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 40px; margin-bottom: 52px; align-items: center;
+    }
+    @media(max-width:580px){ .radar-section { grid-template-columns: 1fr; } }
+    .radar-wrap { display: flex; justify-content: center; }
+    .score-bars { display: flex; flex-direction: column; gap: 20px; }
+    .score-bar-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; }
+    .score-bar-label { font-size: 13px; letter-spacing: 0.02em; }
+    .score-bar-value { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; }
+    .score-bar-track { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 2px; transition: width 1.3s ease; width: 0; }
+
+    .divider { height: 1px; background: var(--border); margin: 48px 0; }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 22px;
+      font-weight: 600; margin-bottom: 24px;
+      border-bottom: 1px solid var(--border); padding-bottom: 14px;
+    }
+    .insight-cards { display: flex; flex-direction: column; gap: 18px; margin-bottom: 52px; }
+    .insight-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 24px;
+      border-left: 3px solid var(--gold);
+    }
+    .insight-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+    .insight-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .insight-discipline-name { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cream-dim); }
+    .insight-score-badge { margin-left: auto; font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; }
+    .insight-text { font-size: 15px; color: var(--cream-dim); line-height: 1.67; }
+
+    .cta-block {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 44px 36px;
+      text-align: center; border-top: 2px solid var(--gold);
+    }
+    .cta-title { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 12px; }
+    .cta-sub { color: var(--cream-dim); font-style: italic; font-size: 15px; line-height: 1.65; max-width: 440px; margin: 0 auto 28px; }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-ghost {
+      background: transparent; border: 1px solid var(--cream-dim);
+      color: var(--cream-dim); padding: 13px 28px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 14px;
+      border-radius: 4px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--cream); color: var(--cream); }
+  </style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div id="screen-welcome" class="screen active">
+  <div class="logo-mark">RB</div>
+  <h1 class="welcome-title">The <span class="gold-word">Repeat Beginner™</span> Score</h1>
+  <p class="welcome-subtitle">15 questions. Five disciplines. A personalized read on your adaptability in the AI era.</p>
+  <div class="disciplines-preview">
+    <span class="discipline-pill">Identity Optionality</span>
+    <span class="discipline-pill">Reframing Before Reskilling</span>
+    <span class="discipline-pill">Pattern Authority</span>
+    <span class="discipline-pill">AI as Exposure Layer</span>
+    <span class="discipline-pill">Fast Ego Detachment</span>
+  </div>
+  <button class="btn-primary" onclick="startQuiz()">Begin the Assessment</button>
+  <p class="meta-text">Takes about 4 minutes &nbsp;·&nbsp; Free</p>
+</div>
+
+<!-- QUESTION -->
+<div id="screen-question" class="screen">
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progress-bar"></div>
+  </div>
+  <div class="question-header">
+    <span class="discipline-label" id="q-discipline-label"></span>
+    <span class="question-counter" id="q-counter"></span>
+  </div>
+  <div class="question-body">
+    <p class="question-text" id="q-text"></p>
+    <div class="options-grid" id="q-options"></div>
+  </div>
+  <div class="question-nav">
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()">Continue &rarr;</button>
+  </div>
+</div>
+
+<!-- EMAIL GATE -->
+<div id="screen-email" class="screen">
+  <div class="email-card">
+    <p class="eyebrow">Almost there</p>
+    <h2 class="email-title">Where should we send your results?</h2>
+    <p class="email-sub">Your personalized Repeat Beginner Score, archetype, and full discipline breakdown are ready. Enter your email to unlock them.</p>
+    <div class="email-row">
+      <input type="email" class="email-input" id="email-input" placeholder="your@email.com" />
+      <button class="btn-primary" onclick="submitEmail()">See My Score</button>
+    </div>
+    <p class="privacy-note">No spam. Just insights worth having. Unsubscribe anytime.</p>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="screen-loading" class="screen">
+  <div class="loading-inner">
+    <div class="loading-ring"></div>
+    <p class="loading-title">Analyzing your profile...</p>
+    <p class="loading-sub" id="loading-msg">Reading your pattern authority...</p>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <div class="results-container">
+    <p class="eyebrow">Your Repeat Beginner Archetype</p>
+    <h2 class="archetype-title" id="r-archetype"></h2>
+    <p class="archetype-desc" id="r-desc"></p>
+
+    <div class="overall-badge">
+      <span class="overall-label">Overall Repeat Beginner Score &nbsp;</span>
+      <span class="overall-number" id="r-overall"></span>
+      <span class="overall-denom">/100</span>
+    </div>
+
+    <div class="radar-section">
+      <div class="radar-wrap">
+        <svg id="radar-svg" width="300" height="300" viewBox="0 0 300 300"></svg>
+      </div>
+      <div class="score-bars" id="score-bars"></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="section-title">Your Discipline Breakdown</p>
+    <div class="insight-cards" id="insight-cards"></div>
+
+    <div class="cta-block">
+      <p class="eyebrow">What's Next for You</p>
+      <h3 class="cta-title">Go deeper on your highest-leverage discipline.</h3>
+      <p class="cta-sub">The Repeat Beginner framework is unpacked in full detail in the book and on the Substack. Your score is the starting point, not the destination.</p>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="window.open('https://a.co/d/e8Cex2h','_blank')">Buy the Book</button>
+        <button class="btn-ghost" onclick="window.open('https://jamiehammond.substack.com','_blank')">Read the Substack</button>
+        <button class="btn-ghost" onclick="retake()">Retake Assessment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DISC = [
+  { name: "Identity Optionality",       short: "Identity",  color: "#f47920" },
+  { name: "Reframing Before Reskilling", short: "Reframing", color: "#ffc14d" },
+  { name: "Pattern Authority",           short: "Patterns",  color: "#7ee8c8" },
+  { name: "AI as Exposure Layer",        short: "AI Layer",  color: "#c4b8ff" },
+  { name: "Fast Ego Detachment",         short: "Ego Speed", color: "#ff8fb0" }
+];
+
+const QUESTIONS = [
+  // Identity Optionality
+  { d:0, text:"If your current title disappeared tomorrow, how clearly could you describe your professional value without it?",
+    opts:["I'd struggle — my identity is deeply tied to this role.",
+          "I could describe it, but it would take me a while to find the words.",
+          "I have a reasonably clear sense of my portable value.",
+          "Very clearly. I've thought this through and I know exactly what travels."] },
+  { d:0, text:"How much of your professional confidence comes from your employer's brand versus your own track record?",
+    opts:["Honestly, the employer brand is doing a lot of the work.",
+          "It's a mix, but the brand matters more than I'd like.",
+          "More from my own track record, though the brand helps.",
+          "Almost entirely from my own track record and judgment."] },
+  { d:0, text:"The last time your role significantly changed or went away, how quickly did you recover your professional footing?",
+    opts:["It took a long time — months, possibly longer.",
+          "Longer than I would have expected given my experience.",
+          "Reasonably quickly, within a few weeks.",
+          "Fast. I moved to what I know and rebuilt from there."] },
+
+  // Reframing Before Reskilling
+  { d:1, text:"When you feel behind on a new technology or industry trend, what is your first instinct?",
+    opts:["Find a course or certification and start learning immediately.",
+          "Ask what other people in my field are doing.",
+          "Try to understand what the change actually means before deciding what to do.",
+          "Map it to what I already know before deciding what, if anything, to learn."] },
+  { d:1, text:"How often do you consciously connect your accumulated experience to new challenges before looking for new skills?",
+    opts:["Rarely. My instinct is to treat new challenges as entirely new.",
+          "Sometimes, but only after I've already tried to chase the new thing.",
+          "Often. I look for the pattern first before reaching for new tools.",
+          "Almost always. It's built into how I approach disruption."] },
+  { d:1, text:"How specifically can you articulate where your existing expertise applies to the AI era?",
+    opts:["Not well. I feel behind and I'm not sure what transfers.",
+          "I have a general sense but it's hard to make it concrete.",
+          "Fairly well. I can name specific areas where my judgment is durable.",
+          "Very specifically. I know exactly which parts of my experience compound in this environment."] },
+
+  // Pattern Authority
+  { d:2, text:"How accurately do you predict how organizational change actually plays out — not in theory but in the room?",
+    opts:["I'm often surprised by how things actually unfold.",
+          "I have some track record but it's inconsistent.",
+          "I'm right more often than not, and people notice.",
+          "Very accurately. Reading how change moves through organizations is one of my sharpest edges."] },
+  { d:2, text:"In your field, how confidently can you distinguish genuine structural change from vendor hype?",
+    opts:["I tend to take the hype at face value.",
+          "I'm skeptical but I don't always know what's real.",
+          "I can usually tell, based on patterns I've seen before.",
+          "Very confidently. I've watched enough cycles to read the signals quickly."] },
+  { d:2, text:"How often do colleagues or clients seek your read on 'what's really happening' versus just your functional output?",
+    opts:["They come for the functional work, not the bigger read.",
+          "Occasionally, but mostly for functional deliverables.",
+          "Often. People value my perspective on the broader pattern.",
+          "Consistently. My judgment on direction is part of what people actually pay for."] },
+
+  // AI as Exposure Layer
+  { d:3, text:"How clearly have you identified which specific parts of your work are most vulnerable to AI displacement?",
+    opts:["I haven't thought about it in a structured way.",
+          "I have a vague sense but haven't mapped it precisely.",
+          "Fairly clearly. I know where I'm exposed.",
+          "Very clearly. I've done a specific audit of durable versus vulnerable work."] },
+  { d:3, text:"How actively are you using AI tools to understand where your judgment adds value versus where it doesn't?",
+    opts:["I'm not using them much at all.",
+          "I use them occasionally but haven't used them as a diagnostic tool.",
+          "Actively. I pay attention to where AI helps versus where I still need to intervene.",
+          "Deliberately. I treat AI as a real-time exposure test for my own value."] },
+  { d:3, text:"How honest have you been with yourself about which of your skills are genuinely durable versus which AI can absorb?",
+    opts:["Not very honest. It's uncomfortable to look at directly.",
+          "Somewhat honest, but I'm probably rationalizing a few things.",
+          "Reasonably honest. I've identified some hard truths.",
+          "Very honest. I've named what's durable and what's not, specifically."] },
+
+  // Fast Ego Detachment
+  { d:4, text:"When a role or project you led gets restructured or handed off, how long does it take you to move forward mentally?",
+    opts:["A long time. I hold on to these transitions more than I'd like.",
+          "Longer than my experience would suggest it should.",
+          "Reasonably quickly. I process and move.",
+          "Fast. I've learned to detach without losing the lesson."] },
+  { d:4, text:"How easily can you say 'I don't know this yet' in a room where you've historically been the expert?",
+    opts:["Not easily. My ego is too tied to being the one with the answer.",
+          "It's hard but I can manage it when I have to.",
+          "Fairly easily. I've made peace with the learning curve.",
+          "Naturally. Being the beginner again doesn't threaten me."] },
+  { d:4, text:"When your previous approach to something stops working, how quickly do you let it go versus defending it?",
+    opts:["I defend it longer than I should.",
+          "I eventually let go, but resistance is my first move.",
+          "I can let go fairly quickly when the evidence is clear.",
+          "Fast. Releasing what no longer works is a discipline I've built deliberately."] }
+];
+
+let currentQ = 0;
+let answers = new Array(15).fill(null);
+let scores = [];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function startQuiz() { showScreen('question'); renderQuestion(); }
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const progress = (currentQ / QUESTIONS.length) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+  document.getElementById('q-discipline-label').textContent = 'Discipline ' + (q.d+1) + ' of 5  ·  ' + DISC[q.d].name;
+  document.getElementById('q-counter').textContent = (currentQ+1) + ' / ' + QUESTIONS.length;
+  document.getElementById('q-text').textContent = q.text;
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  ['A','B','C','D'].forEach((ltr, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[currentQ] === i ? ' selected' : '');
+    btn.innerHTML = `<span class="option-letter">${ltr}</span><span class="option-text">${q.opts[i]}</span>`;
+    btn.onclick = () => {
+      answers[currentQ] = i;
+      document.querySelectorAll('.option-btn').forEach((b,j) => b.classList.toggle('selected', j===i));
+      updateNext();
+    };
+    opts.appendChild(btn);
+  });
+  updateNext();
+}
+
+function updateNext() {
+  const btn = document.getElementById('btn-next');
+  const ready = answers[currentQ] !== null;
+  btn.classList.toggle('enabled', ready);
+  btn.innerHTML = (ready && currentQ === QUESTIONS.length-1) ? 'See Results &rarr;' : 'Continue &rarr;';
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === null) return;
+  if (currentQ < QUESTIONS.length - 1) { currentQ++; renderQuestion(); window.scrollTo(0,0); }
+  else showScreen('email');
+}
+
+function submitEmail() {
+  const inp = document.getElementById('email-input');
+  if (!inp.value || !inp.value.includes('@')) { inp.style.borderColor='#c47b5a'; return; }
+  showScreen('loading');
+  computeScores();
+  runAI();
+}
+
+function computeScores() {
+  scores = [];
+  for (let d = 0; d < 5; d++) {
+    const idxs = QUESTIONS.map((q,i) => q.d===d ? i : -1).filter(i => i>=0);
+    const raw = idxs.reduce((s,i) => s + answers[i] + 1, 0);
+    scores.push(Math.round((raw / 12) * 100));
+  }
+}
+
+const LOADING_MSGS = [
+  "Mapping your identity architecture...",
+  "Measuring pattern recognition depth...",
+  "Assessing ego detachment velocity...",
+  "Reading your AI exposure profile...",
+  "Calibrating your reframing instinct..."
+];
+let msgIdx = 0, msgTimer;
+function cycleMsgs() {
+  msgIdx = (msgIdx+1) % LOADING_MSGS.length;
+  const el = document.getElementById('loading-msg');
+  if (el) el.textContent = LOADING_MSGS[msgIdx];
+}
+
+async function runAI() {
+  msgTimer = setInterval(cycleMsgs, 1900);
+  const overall = Math.round(scores.reduce((a,b)=>a+b)/5);
+
+  const disciplineData = DISC.map((d,i) => {
+    const qs = QUESTIONS.filter(q => q.d===i);
+    const baseIdxs = QUESTIONS.map((q,qi) => q.d===i ? qi : -1).filter(x=>x>=0);
+    return {
+      name: d.name,
+      score: scores[i],
+      answers: baseIdxs.map(qi => ({ q: QUESTIONS[qi].text, a: QUESTIONS[qi].opts[answers[qi]] }))
+    };
+  });
+
+  const prompt = `You are generating personalized results for The Repeat Beginner Score™, a proprietary framework by Jamie Hammond.
+
+The five Repeat Beginner disciplines:
+1. Identity Optionality: Detaching from role without losing authority. Portable value over title-dependent value.
+2. Reframing Before Reskilling: Auditing existing expertise before chasing new credentials. The reframe filters the reskilling.
+3. Pattern Authority: The compounding value of surviving multiple technology cycles. Reading hype vs. genuine structural change.
+4. AI as Exposure Layer: Using AI to honestly audit where judgment is durable vs. where execution is vulnerable.
+5. Fast Ego Detachment: The speed at which a professional can release a former identity and begin again without destabilizing.
+
+User's scores (0-100):
+${disciplineData.map(d => `- ${d.name}: ${d.score}/100`).join('\n')}
+Overall: ${overall}/100
+
+Their answers:
+${disciplineData.map(d => `\n${d.name} (${d.score}/100):\n${d.answers.map(a=>`  Q: ${a.q}\n  A: ${a.a}`).join('\n')}`).join('\n')}
+
+Create a personalized result. The archetype name should be evocative and specific to their actual profile pattern, not generic. The writing should be direct, experience-grounded, and honest — not flattering. Reference their actual answer patterns.
+
+Return ONLY valid JSON with no markdown or backticks:
+{
+  "archetype": "The [2-3 word archetype name]",
+  "archetypeDescription": "2-3 sentences. Sharp, honest, specific to their profile. Not generic positive framing.",
+  "disciplineInsights": [
+    { "discipline": "Identity Optionality", "insight": "1-2 sharp sentences grounded in their specific answers. Honest about gaps, specific about strengths." },
+    { "discipline": "Reframing Before Reskilling", "insight": "..." },
+    { "discipline": "Pattern Authority", "insight": "..." },
+    { "discipline": "AI as Exposure Layer", "insight": "..." },
+    { "discipline": "Fast Ego Detachment", "insight": "..." }
+  ]
+}`;
+
+  try {
+    const res = await fetch("/.netlify/functions/generate-results", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const text = data.content[0].text.trim().replace(/```json|```/g,'').trim();
+    const result = JSON.parse(text);
+    clearInterval(msgTimer);
+    renderResults(result, overall);
+  } catch(e) {
+    clearInterval(msgTimer);
+    const overall2 = Math.round(scores.reduce((a,b)=>a+b)/5);
+    renderResults({
+      archetype: "The Experienced Adapter",
+      archetypeDescription: "You have real accumulated experience and the instincts of someone who has navigated change before. The work now is building the deliberate disciplines that turn that accumulated experience into a durable, portable advantage.",
+      disciplineInsights: DISC.map((d,i) => ({
+        discipline: d.name,
+        insight: scores[i] >= 67
+          ? `Your score of ${scores[i]}/100 suggests this is a genuine strength in your current profile.`
+          : `With a score of ${scores[i]}/100, this is where focused attention will generate the most return.`
+      }))
+    }, overall2);
+  }
+}
+
+function renderResults(result, overall) {
+  document.getElementById('r-archetype').textContent = result.archetype;
+  document.getElementById('r-desc').textContent = result.archetypeDescription;
+  document.getElementById('r-overall').textContent = overall;
+
+  // Score bars
+  const barsEl = document.getElementById('score-bars');
+  barsEl.innerHTML = '';
+  DISC.forEach((d,i) => {
+    const item = document.createElement('div');
+    item.innerHTML = `
+      <div class="score-bar-header">
+        <span class="score-bar-label" style="color:${d.color}">${d.short}</span>
+        <span class="score-bar-value" style="color:${d.color}">${scores[i]}</span>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill" id="bar-${i}" style="background:${d.color}"></div>
+      </div>`;
+    barsEl.appendChild(item);
+  });
+
+  // Insight cards
+  const cardsEl = document.getElementById('insight-cards');
+  cardsEl.innerHTML = '';
+  result.disciplineInsights.forEach((ins,i) => {
+    const card = document.createElement('div');
+    card.className = 'insight-card';
+    card.style.borderLeftColor = DISC[i].color;
+    card.innerHTML = `
+      <div class="insight-card-header">
+        <div class="insight-dot" style="background:${DISC[i].color}"></div>
+        <span class="insight-discipline-name">${ins.discipline}</span>
+        <span class="insight-score-badge" style="color:${DISC[i].color}">${scores[i]}</span>
+      </div>
+      <p class="insight-text">${ins.insight}</p>`;
+    cardsEl.appendChild(card);
+  });
+
+  showScreen('results');
+
+  setTimeout(() => {
+    DISC.forEach((_,i) => {
+      const el = document.getElementById('bar-'+i);
+      if (el) el.style.width = scores[i] + '%';
+    });
+  }, 150);
+
+  setTimeout(drawRadar, 250);
+}
+
+function drawRadar() {
+  const svg = document.getElementById('radar-svg');
+  svg.innerHTML = '';
+  const cx=150, cy=150, r=88, n=5;
+  const angles = Array.from({length:n}, (_,i) => (i*2*Math.PI/n) - Math.PI/2);
+
+  function pts(frac) { return angles.map(a => [cx+r*frac*Math.cos(a), cy+r*frac*Math.sin(a)]); }
+
+  [0.25,0.5,0.75,1].forEach(f => {
+    const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    poly.setAttribute('points', pts(f).map(p=>p.join(',')).join(' '));
+    poly.setAttribute('fill','none'); poly.setAttribute('stroke','rgba(255,255,255,0.15)'); poly.setAttribute('stroke-width','1');
+    svg.appendChild(poly);
+  });
+
+  angles.forEach(a => {
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx); line.setAttribute('y1',cy);
+    line.setAttribute('x2',cx+r*Math.cos(a)); line.setAttribute('y2',cy+r*Math.sin(a));
+    line.setAttribute('stroke','rgba(255,255,255,0.15)'); line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+  });
+
+  const scorePts = angles.map((a,i) => [cx+r*(scores[i]/100)*Math.cos(a), cy+r*(scores[i]/100)*Math.sin(a)]);
+  const poly = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  poly.setAttribute('points', scorePts.map(p=>p.join(',')).join(' '));
+  poly.setAttribute('fill','rgba(244,121,32,0.18)');
+  poly.setAttribute('stroke','#f47920'); poly.setAttribute('stroke-width','2');
+  svg.appendChild(poly);
+
+  scorePts.forEach((pt,i) => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',pt[0]); c.setAttribute('cy',pt[1]); c.setAttribute('r','4');
+    c.setAttribute('fill',DISC[i].color);
+    svg.appendChild(c);
+  });
+
+  // Two-line labels where needed
+  const labelLines = [
+    ["Identity"],
+    ["Reframing"],
+    ["Patterns"],
+    ["AI Layer"],
+    ["Ego", "Speed"]
+  ];
+  const labelR = r + 26;
+  angles.forEach((a,i) => {
+    const lx = cx + labelR*Math.cos(a);
+    const ly = cy + labelR*Math.sin(a);
+    const lines = labelLines[i];
+    const lineH = 11;
+    const startY = ly - ((lines.length - 1) * lineH / 2);
+    lines.forEach((word, li) => {
+      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x', lx);
+      t.setAttribute('y', startY + li * lineH);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('dominant-baseline','middle');
+      t.setAttribute('fill', DISC[i].color);
+      t.setAttribute('font-size','10');
+      t.setAttribute('font-family','Barlow, sans-serif');
+      t.textContent = word;
+      svg.appendChild(t);
+    });
+  });
+}
+
+function retake() {
+  currentQ=0; answers=new Array(15).fill(null); scores=[];
+  showScreen('welcome');
+}
+</script>
+</body>
+</html>
