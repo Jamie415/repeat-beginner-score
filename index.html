@@ -589,7 +589,7 @@ Return ONLY valid JSON with no markdown or backticks:
 }`;
 
   try {
-    const res = await fetch("/.netlify/functions/generate-results", {
+    const res = await fetch("/https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
