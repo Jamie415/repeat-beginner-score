@@ -589,7 +589,7 @@ Return ONLY valid JSON with no markdown or backticks:
 }`;
 
   try {
-    const res = await fetch("/https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
+    const res = await fetch("/.netlify/functions/generate-results", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -600,6 +600,22 @@ Return ONLY valid JSON with no markdown or backticks:
     const text = data.content[0].text.trim().replace(/```json|```/g,'').trim();
     const result = JSON.parse(text);
     clearInterval(msgTimer);
+
+    // Log to Google Sheets
+    const email = document.getElementById('email-input').value;
+    fetch("https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: email,
+        overall: overall,
+        scores: scores,
+        archetype: result.archetype,
+        archetypeDescription: result.archetypeDescription
+      })
+    }).catch(() => {});
+
     renderResults(result, overall);
   } catch(e) {
     clearInterval(msgTimer);
