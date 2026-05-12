@@ -588,8 +588,7 @@ Return ONLY valid JSON with no markdown or backticks:
   ]
 }`;
 
-  try {
-    const res = await fetch("/.netlify/functions/generate-results", {
+  try {const res = await fetch("https://repeatbeginnerscore.netlify.app/.netlify/functions/generate-results", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -603,7 +602,7 @@ Return ONLY valid JSON with no markdown or backticks:
 
     // Log to Google Sheets
     const email = document.getElementById('email-input').value;
-fetch("/.netlify/functions/log-results", {
+fetch("https://repeatbeginnerscore.netlify.app/.netlify/functions/log-results", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
