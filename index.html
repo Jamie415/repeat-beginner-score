@@ -603,17 +603,17 @@ Return ONLY valid JSON with no markdown or backticks:
 
     // Log to Google Sheets
     const email = document.getElementById('email-input').value;
-    fetch("https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify({
-        email: email,
-        overall: overall,
-        scores: scores,
-        archetype: result.archetype,
-        archetypeDescription: result.archetypeDescription
-      })
-    }).catch(() => {});
+fetch("/.netlify/functions/log-results", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    email: email,
+    overall: overall,
+    scores: scores,
+    archetype: result.archetype,
+    archetypeDescription: result.archetypeDescription
+  })
+}).catch(() => {});
 
     renderResults(result, overall);
   } catch(e) {
