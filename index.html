@@ -596,7 +596,6 @@ Return ONLY valid JSON with no markdown or backticks:
       })
     });
     const data = await res.json();
-    console.log("API response:", JSON.stringify(data));
     const text = data.content[0].text.trim().replace(/```json|```/g,'').trim();
     const result = JSON.parse(text);
     clearInterval(msgTimer);
