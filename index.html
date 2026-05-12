@@ -606,7 +606,6 @@ Return ONLY valid JSON with no markdown or backticks:
     fetch("https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
       method: "POST",
       mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email: email,
         overall: overall,
