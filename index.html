@@ -615,7 +615,7 @@ fetch("https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3g
   method: "POST",
   mode: "no-cors",
   body: formData
-}).catch(err => console.log("Sheet error:", err));
+}).catch(() => {});
     renderResults(result, overall);
   } catch(e) {
     clearInterval(msgTimer);
