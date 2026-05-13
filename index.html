@@ -602,19 +602,20 @@ Return ONLY valid JSON with no markdown or backticks:
 
     // Log to Google Sheets
     const email = document.getElementById('email-input').value;
-       console.log("Attempting sheet log for:", email, overall, scores);
-fetch("https://repeatbeginnerscore.netlify.app/.netlify/functions/log-results", {
+const sheetData = JSON.stringify({
+  email: email,
+  overall: overall,
+  scores: scores,
+  archetype: result.archetype,
+  archetypeDescription: result.archetypeDescription
+});
+const formData = new FormData();
+formData.append("data", sheetData);
+fetch("https://script.google.com/macros/s/AKfycbz1GuqlQchLzuReTdDpfHFEAOnqHkoJ3gmtU7-B7N5GTfvLKS5y3UtfdQAPbuAcp5p1/exec", {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    email: email,
-    overall: overall,
-    scores: scores,
-    archetype: result.archetype,
-    archetypeDescription: result.archetypeDescription
-  })
-}).catch(() => {});
-
+  mode: "no-cors",
+  body: formData
+}).catch(err => console.log("Sheet error:", err));
     renderResults(result, overall);
   } catch(e) {
     clearInterval(msgTimer);
